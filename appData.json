@@ -1,0 +1,23 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "name": "洁洁姐姐",
+      "balance": 13,
+      "color": "#FF6B8B",
+      "currencyName": "贝币"
+    },
+    {
+      "id": "user2",
+      "name": "锅锅哥哥",
+      "balance": 22,
+      "color": "#5D8CF5",
+      "currencyName": "小狗币"
+    }
+  ],
+  "currentUserId": "user1",
+  "tasks": [],
+  "rewards": [],
+  "transactions": [],
+  "lastSyncTime": "2025-11-18T01:52:27.588Z"
+}

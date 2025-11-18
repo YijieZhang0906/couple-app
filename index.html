@@ -1,0 +1,2301 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>情侣任务奖励 - 爱情加油站</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF6B8B',
+            secondary: '#5D8CF5',
+            accent: '#FFD700',
+            light: '#F8F9FA',
+            dark: '#333333',
+            muted: '#666666'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+      }
+      .btn-primary {
+        @apply bg-primary text-white px-4 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+      }
+      .btn-secondary {
+        @apply bg-secondary text-white px-4 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50;
+      }
+      .btn-outline {
+        @apply border border-primary text-primary px-4 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+      }
+      .input-field {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+      }
+      .heart-bg {
+        background-image: url('https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/5af3f3d2c5fd4cdc894d3d3a674837bb~tplv-a9rns2rl98-image.image?rcl=20251117004334CA18847443DB5BE9857E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765903458&x-signature=STs2qrmNFg5iIHb8e2vNaG19kyY%3D');
+        background-size: cover;
+        background-position: center;
+      }
+    }
+  </style>
+</head>
+<body class="bg-light min-h-screen">
+  <!-- 页面容器 -->
+  <div id="app" class="flex flex-col min-h-screen">
+    <!-- 登录/欢迎页面 -->
+    <div id="welcome-page" class="fixed inset-0 z-50 heart-bg flex items-center justify-center">
+      <div class="bg-white bg-opacity-90 rounded-2xl p-8 max-w-md w-full shadow-xl">
+        <div class="text-center mb-8">
+          <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/d35f750470414b31a37074a0b1177f09~tplv-a9rns2rl98-image.image?rcl=20251117004334CA18847443DB5BE9857E&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1765903452&amp;x-signature=40hxGpqdYcTsF1u%2Fy8owinKL3m0%3D" alt="情侣任务奖励" class="w-32 h-32 mx-auto mb-4 animate-float">
+          <h1 class="text-3xl font-bold text-primary">爱情加油站</h1>
+          <p class="text-muted mt-2">让爱情更有趣的任务奖励系统</p>
+        </div>
+        
+        <div id="setup-form" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-dark mb-1">你的名字</label>
+              <input type="text" id="user1-name" class="input-field" placeholder="例如：小甜">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-dark mb-1">对方的名字</label>
+              <input type="text" id="user2-name" class="input-field" placeholder="例如：小酷">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-dark mb-1">你的货币名称</label>
+              <input type="text" id="user1-currency" class="input-field" placeholder="例如：爱心值" value="爱心值">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-dark mb-1">对方的货币名称</label>
+              <input type="text" id="user2-currency" class="input-field" placeholder="例如：甜蜜币" value="甜蜜币">
+            </div>
+          </div>
+          
+          <div class="pt-4">
+            <button id="start-btn" class="btn-primary w-full py-3 text-lg">开始我们的爱情之旅</button>
+          </div>
+          
+          <div class="text-center text-sm text-muted mt-4">
+            <p>已有数据？<button id="load-data-btn" class="text-primary hover:underline">加载之前的数据</button></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+      <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/d35f750470414b31a37074a0b1177f09~tplv-a9rns2rl98-image.image?rcl=20251117004334CA18847443DB5BE9857E&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1765903452&amp;x-signature=40hxGpqdYcTsF1u%2Fy8owinKL3m0%3D" alt="Logo" class="w-8 h-8">
+          <h1 class="text-xl font-bold text-primary">爱情加油站</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <div id="user-balance" class="hidden items-center space-x-1 bg-light px-3 py-1 rounded-full">
+            <span id="current-user-name" class="font-medium"></span>
+            <span>:</span>
+            <span id="current-user-balance" class="font-bold text-primary"></span>
+            <span id="currency-symbol"></span>
+          </div>
+          
+          <button id="settings-btn" class="text-muted hover:text-primary transition-colors">
+            <i class="fa fa-cog text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+      <!-- 页面内容将通过JavaScript动态加载 -->
+      <div id="page-content"></div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <nav class="bg-white shadow-sm py-2 fixed bottom-0 left-0 right-0 z-40">
+      <div class="container mx-auto flex justify-around">
+        <button class="nav-btn flex flex-col items-center py-2 px-4 text-primary" data-page="dashboard">
+          <i class="fa fa-home text-xl"></i>
+          <span class="text-xs mt-1">首页</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center py-2 px-4 text-muted" data-page="tasks">
+          <i class="fa fa-tasks text-xl"></i>
+          <span class="text-xs mt-1">任务</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center py-2 px-4 text-muted" data-page="rewards">
+          <i class="fa fa-gift text-xl"></i>
+          <span class="text-xs mt-1">奖励</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center py-2 px-4 text-muted" data-page="history">
+          <i class="fa fa-history text-xl"></i>
+          <span class="text-xs mt-1">记录</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 设置弹窗 -->
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark">设置</h2>
+          <button id="close-settings" class="text-muted hover:text-dark">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="space-y-6">
+          <div>
+            <h3 class="font-medium text-dark mb-2">用户信息</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-muted mb-1">你的名字</label>
+                <input type="text" id="settings-user1-name" class="input-field">
+              </div>
+              <div>
+                <label class="block text-sm text-muted mb-1">对方的名字</label>
+                <input type="text" id="settings-user2-name" class="input-field">
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-dark mb-2">货币设置</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-muted mb-1">你的货币名称</label>
+                <input type="text" id="settings-user1-currency" class="input-field">
+              </div>
+              <div>
+                <label class="block text-sm text-muted mb-1">对方的货币名称</label>
+                <input type="text" id="settings-user2-currency" class="input-field">
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-dark mb-2">余额调整</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-muted mb-1" id="settings-current-user-label">你的余额</label>
+                <div class="flex space-x-2">
+                  <input type="number" id="settings-current-user-balance" class="input-field" min="0">
+                  <span id="settings-current-user-currency-symbol" class="text-sm self-end"></span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm text-muted mb-1" id="settings-partner-user-label">对方的余额</label>
+                <div class="flex space-x-2">
+                  <input type="number" id="settings-partner-user-balance" class="input-field" min="0">
+                  <span id="settings-partner-user-currency-symbol" class="text-sm self-end"></span>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-muted mt-2">可以直接调整双方的货币数量</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-dark mb-2">数据管理</h3>
+            <div class="space-y-2">
+              <button id="save-data-btn" class="btn-outline w-full">
+                <i class="fa fa-download mr-2"></i>导出数据
+              </button>
+              <button id="clear-data-btn" class="text-red-500 hover:text-red-700 transition-colors w-full py-2 flex items-center justify-center">
+                <i class="fa fa-trash mr-2"></i>清除所有数据
+              </button>
+            </div>
+          </div>
+          
+          <div class="pt-4">
+            <button id="save-settings-btn" class="btn-primary w-full">保存设置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 任务详情弹窗 -->
+    <div id="task-detail-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark" id="task-detail-title">任务详情</h2>
+          <button class="close-modal text-muted hover:text-dark p-2 rounded-full hover:bg-gray-100">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div id="task-detail-content" class="space-y-4">
+          <!-- 任务详情内容将通过JavaScript动态加载 -->
+        </div>
+        
+        <div id="task-detail-actions" class="flex space-x-2 mt-6">
+          <!-- 任务操作按钮将通过JavaScript动态加载 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖励详情弹窗 -->
+    <div id="reward-detail-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark" id="reward-detail-title">奖励详情</h2>
+          <button class="close-modal text-muted hover:text-dark p-2 rounded-full hover:bg-gray-100">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div id="reward-detail-content" class="space-y-4">
+          <!-- 奖励详情内容将通过JavaScript动态加载 -->
+        </div>
+        
+        <div id="reward-detail-actions" class="flex space-x-2 mt-6">
+          <!-- 奖励操作按钮将通过JavaScript动态加载 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 新建任务弹窗 -->
+    <div id="new-task-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark">发布新任务</h2>
+          <button class="close-modal text-muted hover:text-dark p-2 rounded-full hover:bg-gray-100">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <form id="new-task-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务标题</label>
+            <input type="text" id="task-title" class="input-field" placeholder="例如：为对方准备一顿早餐">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务描述</label>
+            <textarea id="task-description" class="input-field" rows="3" placeholder="详细描述任务内容..."></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">奖励<span id="new-task-currency"></span></label>
+            <input type="number" id="task-reward" class="input-field" min="1" value="10">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务接收者</label>
+            <select id="task-assignee" class="input-field">
+              <!-- 接收者选项将通过JavaScript动态加载 -->
+            </select>
+          </div>
+          
+          <div class="pt-4">
+            <button type="submit" class="btn-primary w-full">发布任务</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- 编辑任务弹窗 -->
+    <div id="edit-task-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark">编辑任务</h2>
+          <button class="close-modal text-muted hover:text-dark p-2 rounded-full hover:bg-gray-100">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <form id="edit-task-form" class="space-y-4">
+          <input type="hidden" id="edit-task-id">
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务标题</label>
+            <input type="text" id="edit-task-title" class="input-field" placeholder="例如：为对方准备一顿早餐">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务描述</label>
+            <textarea id="edit-task-description" class="input-field" rows="3" placeholder="详细描述任务内容..."></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">奖励<span id="edit-task-currency"></span></label>
+            <input type="number" id="edit-task-reward" class="input-field" min="1" value="10">
+          </div>
+          
+          <div class="pt-4">
+            <button type="submit" class="btn-primary w-full">保存修改</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- 编辑任务弹窗 -->
+    <div id="edit-task-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark">编辑任务</h2>
+          <button class="close-modal text-muted hover:text-dark p-2 rounded-full hover:bg-gray-100">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <form id="edit-task-form" class="space-y-4">
+          <input type="hidden" id="edit-task-id">
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务标题</label>
+            <input type="text" id="edit-task-title" class="input-field" placeholder="例如：为对方准备一顿早餐">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">任务描述</label>
+            <textarea id="edit-task-description" class="input-field" rows="3" placeholder="详细描述任务内容..."></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">奖励<span id="edit-task-currency"></span></label>
+            <input type="number" id="edit-task-reward" class="input-field" min="1" value="10">
+          </div>
+          
+          <div class="pt-4">
+            <button type="submit" class="btn-primary w-full">保存修改</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 新建奖励弹窗 -->
+    <div id="new-reward-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-dark">创建新奖励</h2>
+          <button class="close-modal text-muted hover:text-dark p-2 rounded-full hover:bg-gray-100">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <form id="new-reward-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">奖励标题</label>
+            <input type="text" id="reward-title" class="input-field" placeholder="例如：一次按摩服务">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">奖励描述</label>
+            <textarea id="reward-description" class="input-field" rows="3" placeholder="详细描述奖励内容..."></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-dark mb-1">所需<span id="new-reward-currency"></span></label>
+            <input type="number" id="reward-cost" class="input-field" min="1" value="50">
+          </div>
+          
+          <div class="pt-4">
+            <button type="submit" class="btn-primary w-full">创建奖励</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div id="confirm-dialog" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 w-full max-w-md">
+        <h2 class="text-xl font-bold text-dark mb-4" id="confirm-title">确认操作</h2>
+        <p class="text-muted mb-6" id="confirm-message">你确定要执行此操作吗？</p>
+        
+        <div class="flex space-x-4">
+          <button id="confirm-cancel" class="btn-outline flex-1">取消</button>
+          <button id="confirm-ok" class="btn-primary flex-1">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div id="notification" class="fixed top-4 right-4 z-50 max-w-sm bg-white rounded-lg shadow-lg p-4 transform translate-x-full transition-transform duration-300">
+      <div class="flex items-start">
+        <div id="notification-icon" class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full mr-3">
+          <i class="fa" id="notification-icon-i"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-medium text-dark" id="notification-title">通知标题</h3>
+          <p class="text-xs text-muted mt-1" id="notification-message">通知内容</p>
+        </div>
+        <button id="close-notification" class="text-muted hover:text-dark ml-4">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 数据模型
+    const appData = {
+      users: [
+        { id: 'user1', name: '用户1', balance: 100, color: '#FF6B8B', currencyName: '爱心值' },
+        { id: 'user2', name: '用户2', balance: 100, color: '#5D8CF5', currencyName: '爱心值' }
+      ],
+      currentUserId: 'user1',
+      tasks: [],
+      rewards: [],
+      transactions: [],
+      lastSyncTime: new Date().toISOString()
+    };
+
+    // 工具函数
+    const utils = {
+      // 生成唯一ID
+      generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+      },
+      
+      // 格式化日期
+      formatDate(dateString) {
+        const date = new Date(dateString);
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+      },
+      
+      // 显示通知
+      showNotification(title, message, type = 'success') {
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const notificationIcon = document.getElementById('notification-icon');
+        const notificationIconI = document.getElementById('notification-icon-i');
+        
+        notificationTitle.textContent = title;
+        notificationMessage.textContent = message;
+        
+        // 设置图标和颜色
+        if (type === 'success') {
+          notificationIcon.className = 'flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-500 mr-3';
+          notificationIconI.className = 'fa fa-check';
+        } else if (type === 'error') {
+          notificationIcon.className = 'flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-500 mr-3';
+          notificationIconI.className = 'fa fa-exclamation';
+        } else if (type === 'warning') {
+          notificationIcon.className = 'flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-500 mr-3';
+          notificationIconI.className = 'fa fa-exclamation-triangle';
+        } else if (type === 'info') {
+          notificationIcon.className = 'flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-500 mr-3';
+          notificationIconI.className = 'fa fa-info';
+        }
+        
+        // 显示通知
+        notification.classList.remove('translate-x-full');
+        
+        // 3秒后自动隐藏
+        setTimeout(() => {
+          notification.classList.add('translate-x-full');
+        }, 3000);
+      },
+      
+      // 显示确认对话框
+      showConfirmDialog(title, message, confirmCallback) {
+        const confirmDialog = document.getElementById('confirm-dialog');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMessage = document.getElementById('confirm-message');
+        const confirmOk = document.getElementById('confirm-ok');
+        const confirmCancel = document.getElementById('confirm-cancel');
+        
+        confirmTitle.textContent = title;
+        confirmMessage.textContent = message;
+        
+        confirmDialog.classList.remove('hidden');
+        
+        // 绑定确认按钮事件
+        const okHandler = () => {
+          confirmCallback();
+          confirmDialog.classList.add('hidden');
+          confirmOk.removeEventListener('click', okHandler);
+          confirmCancel.removeEventListener('click', cancelHandler);
+        };
+        
+        // 绑定取消按钮事件
+        const cancelHandler = () => {
+          confirmDialog.classList.add('hidden');
+          confirmOk.removeEventListener('click', okHandler);
+          confirmCancel.removeEventListener('click', cancelHandler);
+        };
+        
+        confirmOk.addEventListener('click', okHandler);
+        confirmCancel.addEventListener('click', cancelHandler);
+      },
+      
+  // 保存数据到服务器
+saveData() {
+  fetch('/api/app-data', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(appData)
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('服务器返回错误');
+      }
+      this.showNotification('保存成功', '数据已同步到服务器');
+    })
+    .catch(err => {
+      console.error('保存失败:', err);
+      this.showNotification('保存失败', '无法连接服务器', 'error');
+    });
+},
+      
+     // 从服务器加载数据
+loadData() {
+  return fetch('/api/app-data')
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('服务器返回错误');
+      }
+      return res.json();
+    })
+    .then(data => {
+      Object.assign(appData, data);
+      this.showNotification('加载成功', '已从服务器获取数据');
+      return true;
+    })
+    .catch(err => {
+      console.error('加载失败:', err);
+      this.showNotification('加载失败', '无法连接服务器', 'error');
+      return false;
+    });
+},
+
+      
+      // 导出数据
+      exportData() {
+        try {
+          const dataStr = JSON.stringify(appData, null, 2);
+          const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+          
+          const exportFileDefaultName = `couple_task_app_data_${new Date().toISOString().slice(0,10)}.json`;
+          
+          const linkElement = document.createElement('a');
+          linkElement.setAttribute('href', dataUri);
+          linkElement.setAttribute('download', exportFileDefaultName);
+          linkElement.click();
+          
+          this.showNotification('导出成功', '数据已导出为JSON文件');
+        } catch (error) {
+          this.showNotification('导出失败', '数据导出出错', 'error');
+          console.error('导出数据失败:', error);
+        }
+      },
+      
+      // 清除所有数据
+      clearData() {
+        this.showConfirmDialog('确认清除', '你确定要清除所有数据吗？此操作不可恢复。', () => {
+          try {
+            localStorage.removeItem('coupleTaskAppData');
+            
+            // 重置数据
+            appData.users = [
+              { id: 'user1', name: '用户1', balance: 100, color: '#FF6B8B' },
+              { id: 'user2', name: '用户2', balance: 100, color: '#5D8CF5' }
+            ];
+            appData.currentUserId = 'user1';
+            appData.currencyName = '爱心值';
+            appData.tasks = [];
+            appData.rewards = [];
+            appData.transactions = [];
+            appData.lastSyncTime = new Date().toISOString();
+            
+            // 更新UI
+            updateUI();
+            
+            // 显示欢迎页面
+            document.getElementById('welcome-page').classList.remove('hidden');
+            
+            this.showNotification('清除成功', '所有数据已清除');
+          } catch (error) {
+            this.showNotification('清除失败', '数据清除出错', 'error');
+            console.error('清除数据失败:', error);
+          }
+        });
+      },
+      
+      // 获取当前用户
+      getCurrentUser() {
+        return appData.users.find(user => user.id === appData.currentUserId);
+      },
+      
+      // 获取对方用户
+      getPartnerUser() {
+        return appData.users.find(user => user.id !== appData.currentUserId);
+      },
+      
+      // 切换用户
+      switchUser() {
+        appData.currentUserId = appData.currentUserId === 'user1' ? 'user2' : 'user1';
+        updateUI();
+        this.showNotification('用户切换', `当前用户: ${this.getCurrentUser().name}`);
+      },
+      
+      // 创建新任务
+      createTask(title, description, rewardAmount, assigneeId) {
+        const task = {
+          id: this.generateId(),
+          title,
+          description,
+          rewardAmount,
+          status: 'pending', // pending, completed, verified
+          creatorId: appData.currentUserId,
+          assigneeId,
+          createdAt: new Date().toISOString(),
+          completedAt: null,
+          verifiedAt: null,
+          verificationNotes: null
+        };
+        
+        appData.tasks.push(task);
+        this.saveData();
+        return task;
+      },
+      
+      // 更新任务状态
+      updateTaskStatus(taskId, status, notes = null) {
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (task) {
+          task.status = status;
+          
+          if (status === 'completed') {
+            task.completedAt = new Date().toISOString();
+          } else if (status === 'verified') {
+            task.verifiedAt = new Date().toISOString();
+            task.verificationNotes = notes;
+            
+            // 发放奖励
+            const assignee = appData.users.find(u => u.id === task.assigneeId);
+            if (assignee) {
+              assignee.balance += task.rewardAmount;
+              
+              // 记录交易
+              this.recordTransaction('task_reward', task.rewardAmount, `完成任务: ${task.title}`, task.assigneeId, task.id);
+            }
+          }
+          
+          this.saveData();
+          return true;
+        }
+        return false;
+      },
+      
+      // 删除任务
+      deleteTask(taskId) {
+        const taskIndex = appData.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+          appData.tasks.splice(taskIndex, 1);
+          this.saveData();
+          return true;
+        }
+        return false;
+      },
+      
+      // 删除任务
+      deleteTask(taskId) {
+        const taskIndex = appData.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+          appData.tasks.splice(taskIndex, 1);
+          this.saveData();
+          return true;
+        }
+        return false;
+      },
+      
+      // 创建新奖励
+      createReward(title, description, costAmount) {
+        const reward = {
+          id: this.generateId(),
+          title,
+          description,
+          costAmount,
+          status: 'available', // available, redeemed
+          creatorId: appData.currentUserId,
+          redeemerId: null,
+          createdAt: new Date().toISOString(),
+          redeemedAt: null
+        };
+        
+        appData.rewards.push(reward);
+        this.saveData();
+        return reward;
+      },
+      
+      // 兑换奖励
+      redeemReward(rewardId) {
+        const reward = appData.rewards.find(r => r.id === rewardId);
+        if (reward && reward.status === 'available') {
+          const currentUser = this.getCurrentUser();
+          
+          // 检查余额是否足够
+          if (currentUser.balance >= reward.costAmount) {
+            // 扣减货币
+            currentUser.balance -= reward.costAmount;
+            
+            // 更新奖励状态
+            reward.status = 'redeemed';
+            reward.redeemerId = appData.currentUserId;
+            reward.redeemedAt = new Date().toISOString();
+            
+            // 记录交易
+            this.recordTransaction('reward_redemption', -reward.costAmount, `兑换奖励: ${reward.title}`, appData.currentUserId, null, rewardId);
+            
+            this.saveData();
+            return true;
+          } else {
+            this.showNotification('兑换失败', `你的${this.getCurrentUser().currencyName}不足`, 'error');
+            return false;
+          }
+        }
+        return false;
+      },
+      
+      // 记录交易
+      recordTransaction(type, amount, description, userId, relatedTaskId = null, relatedRewardId = null) {
+        const transaction = {
+          id: this.generateId(),
+          type, // task_reward, reward_redemption
+          amount,
+          description,
+          userId,
+          relatedTaskId,
+          relatedRewardId,
+          timestamp: new Date().toISOString()
+        };
+        
+        appData.transactions.push(transaction);
+        return transaction;
+      }
+    };
+
+    // 页面渲染函数
+    const renderPages = {
+      // 渲染仪表盘页面
+      dashboard() {
+        const currentUser = utils.getCurrentUser();
+        const partnerUser = utils.getPartnerUser();
+        
+        // 获取最近的任务
+        const recentTasks = [...appData.tasks]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 3);
+        
+        // 获取可用的奖励
+        const availableRewards = appData.rewards.filter(reward => reward.status === 'available');
+        
+        return `
+          <div class="space-y-6">
+            <!-- 用户余额卡片 -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-white rounded-xl shadow-sm p-4 card-hover border-l-4" style="border-color: ${currentUser.color}">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <p class="text-muted text-sm">你的${currentUser.currencyName}</p>
+                    <h3 class="text-2xl font-bold" style="color: ${currentUser.color}">${currentUser.balance}</h3>
+                  </div>
+                  <button id="switch-user-btn" class="text-muted hover:text-primary transition-colors">
+                    <i class="fa fa-exchange text-xl"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-xl shadow-sm p-4 card-hover border-l-4" style="border-color: ${partnerUser.color}">
+                <div>
+                  <p class="text-muted text-sm">${partnerUser.name}的${partnerUser.currencyName}</p>
+                  <h3 class="text-2xl font-bold" style="color: ${partnerUser.color}">${partnerUser.balance}</h3>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 快速操作按钮 -->
+            <div class="flex space-x-4">
+              <button id="new-task-btn" class="btn-primary flex-1 flex items-center justify-center">
+                <i class="fa fa-plus mr-2"></i>发布新任务
+              </button>
+              <button id="new-reward-btn" class="btn-secondary flex-1 flex items-center justify-center">
+                <i class="fa fa-gift mr-2"></i>创建新奖励
+              </button>
+            </div>
+            
+            <!-- 最近任务 -->
+            <div class="bg-white rounded-xl shadow-sm p-4">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-dark">最近任务</h2>
+                <a href="#" class="text-primary hover:underline text-sm" data-navigate="tasks">查看全部</a>
+              </div>
+              
+              ${recentTasks.length > 0 ? `
+                <div class="space-y-3">
+                  ${recentTasks.map(task => {
+                    const creator = appData.users.find(u => u.id === task.creatorId);
+                    const assignee = appData.users.find(u => u.id === task.assigneeId);
+                    let statusBadge = '';
+                    
+                    if (task.status === 'pending') {
+                      statusBadge = '<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">待完成</span>';
+                    } else if (task.status === 'completed') {
+                      statusBadge = '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">待审核</span>';
+                    } else if (task.status === 'verified') {
+                      statusBadge = '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">已完成</span>';
+                    }
+                    
+                    return `
+                      <div class="task-card p-3 border rounded-lg card-hover cursor-pointer" data-task-id="${task.id}">
+                        <div class="flex justify-between items-start">
+                          <h3 class="font-medium text-dark">${task.title}</h3>
+                          ${statusBadge}
+                        </div>
+                        <p class="text-sm text-muted mt-1 line-clamp-1">${task.description}</p>
+                        <div class="flex justify-between items-center mt-2">
+                          <span class="text-xs text-muted">
+                            ${creator.name} → ${assignee.name}
+                          </span>
+                          <span class="text-xs font-bold" style="color: ${creator.color}">
+                            +${task.rewardAmount} ${appData.currencyName}
+                          </span>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              ` : `
+                <div class="text-center py-6 text-muted">
+                  <i class="fa fa-clipboard text-3xl mb-2"></i>
+                  <p>暂无任务记录</p>
+                  <p class="text-sm mt-1">点击"发布新任务"开始</p>
+                </div>
+              `}
+            </div>
+            
+            <!-- 可用奖励 -->
+            <div class="bg-white rounded-xl shadow-sm p-4">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-dark">可用奖励</h2>
+                <a href="#" class="text-primary hover:underline text-sm" data-navigate="rewards">查看全部</a>
+              </div>
+              
+              ${availableRewards.length > 0 ? `
+                <div class="grid grid-cols-2 gap-3">
+                  ${availableRewards.map(reward => {
+                    const creator = appData.users.find(u => u.id === reward.creatorId);
+                    
+                    return `
+                      <div class="reward-card p-3 border rounded-lg card-hover cursor-pointer" data-reward-id="${reward.id}">
+                        <h3 class="font-medium text-dark text-sm">${reward.title}</h3>
+                        <p class="text-xs text-muted mt-1 line-clamp-2">${reward.description}</p>
+                        <div class="mt-2 flex justify-between items-center">
+                          <span class="text-xs font-bold" style="color: ${creator.color}">
+                            ${reward.costAmount} ${appData.currencyName}
+                          </span>
+                          <span class="text-xs text-muted">
+                            ${creator.name}提供
+                          </span>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              ` : `
+                <div class="text-center py-6 text-muted">
+                  <i class="fa fa-gift text-3xl mb-2"></i>
+                  <p>暂无奖励记录</p>
+                  <p class="text-sm mt-1">点击"创建新奖励"开始</p>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      },
+      
+      // 渲染任务页面
+      tasks() {
+        // 按状态分组任务
+        const pendingTasks = appData.tasks.filter(task => task.status === 'pending');
+        const completedTasks = appData.tasks.filter(task => task.status === 'completed');
+        const verifiedTasks = appData.tasks.filter(task => task.status === 'verified');
+        
+        return `
+          <div class="space-y-6">
+            <div class="flex justify-between items-center">
+              <h1 class="text-2xl font-bold text-dark">任务管理</h1>
+              <button id="tasks-new-task-btn" class="btn-primary">
+                <i class="fa fa-plus mr-1"></i> 新任务
+              </button>
+            </div>
+            
+            <!-- 任务筛选标签 -->
+            <div class="flex space-x-2 overflow-x-auto pb-2">
+              <button class="task-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-primary text-white" data-filter="all">
+                全部任务
+              </button>
+              <button class="task-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-gray-200 text-dark" data-filter="pending">
+                待完成 (${pendingTasks.length})
+              </button>
+              <button class="task-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-gray-200 text-dark" data-filter="completed">
+                待审核 (${completedTasks.length})
+              </button>
+              <button class="task-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-gray-200 text-dark" data-filter="verified">
+                已完成 (${verifiedTasks.length})
+              </button>
+            </div>
+            
+            <!-- 任务列表 -->
+            <div id="tasks-list" class="space-y-3">
+              ${this.renderTaskList(appData.tasks)}
+            </div>
+          </div>
+        `;
+      },
+      
+      // 渲染任务列表
+      renderTaskList(tasks) {
+        if (tasks.length === 0) {
+          return `
+            <div class="text-center py-8 text-muted">
+              <i class="fa fa-clipboard text-4xl mb-3"></i>
+              <p class="text-lg">暂无任务</p>
+              <p class="mt-1">点击"新任务"按钮创建任务</p>
+            </div>
+          `;
+        }
+        
+        return tasks.map(task => {
+          const creator = appData.users.find(u => u.id === task.creatorId);
+          const assignee = appData.users.find(u => u.id === task.assigneeId);
+          let statusBadge = '';
+          let actionButtons = '';
+          
+          // 根据任务状态设置徽章
+          if (task.status === 'pending') {
+            statusBadge = '<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">待完成</span>';
+            
+            // 如果当前用户是任务接收者，显示"标记完成"按钮
+            if (appData.currentUserId === task.assigneeId) {
+              actionButtons = `
+                <button class="task-action-btn text-xs px-3 py-1 rounded-full bg-primary text-white" data-task-id="${task.id}" data-action="complete">
+                  标记完成
+                </button>
+              `;
+            }
+          } else if (task.status === 'completed') {
+            statusBadge = '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">待审核</span>';
+            
+            // 如果当前用户是任务创建者，显示"审核"按钮
+            if (appData.currentUserId === task.creatorId) {
+              actionButtons = `
+                <button class="task-action-btn text-xs px-3 py-1 rounded-full bg-green-500 text-white" data-task-id="${task.id}" data-action="verify">
+                  审核
+                </button>
+              `;
+            }
+          } else if (task.status === 'verified') {
+            statusBadge = '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">已完成</span>';
+          }
+          
+          return `
+            <div class="task-card bg-white p-4 rounded-xl shadow-sm border-l-4" style="border-color: ${creator.color}">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium text-dark">${task.title}</h3>
+                  <p class="text-sm text-muted mt-1">${task.description}</p>
+                </div>
+                ${statusBadge}
+              </div>
+              
+              <div class="flex flex-wrap justify-between items-center mt-3 text-xs">
+                <div class="flex items-center space-x-4">
+                  <div class="flex items-center">
+                    <span class="text-muted">创建者:</span>
+                    <span class="ml-1 font-medium" style="color: ${creator.color}">${creator.name}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <span class="text-muted">接收者:</span>
+                    <span class="ml-1 font-medium" style="color: ${assignee.color}">${assignee.name}</span>
+                  </div>
+                </div>
+                
+                <div class="flex items-center space-x-2 mt-2 sm:mt-0">
+                  <span class="font-bold" style="color: ${creator.color}">
+                    +${task.rewardAmount} ${creator.currencyName}
+                  </span>
+                  ${actionButtons}
+                </div>
+              </div>
+              
+              <div class="mt-2 text-xs text-muted">
+                创建时间: ${utils.formatDate(task.createdAt)}
+                ${task.completedAt ? `<br>完成时间: ${utils.formatDate(task.completedAt)}` : ''}
+                ${task.verifiedAt ? `<br>审核时间: ${utils.formatDate(task.verifiedAt)}` : ''}
+              </div>
+              
+              ${task.verificationNotes ? `
+                <div class="mt-2 p-2 bg-gray-50 rounded text-xs">
+                  <span class="text-muted">审核备注:</span> ${task.verificationNotes}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      },
+      
+      // 渲染奖励页面
+      rewards() {
+        // 按状态分组奖励
+        const availableRewards = appData.rewards.filter(reward => reward.status === 'available');
+        const redeemedRewards = appData.rewards.filter(reward => reward.status === 'redeemed');
+        
+        return `
+          <div class="space-y-6">
+            <div class="flex justify-between items-center">
+              <h1 class="text-2xl font-bold text-dark">兑换商城</h1>
+              <button id="rewards-new-reward-btn" class="btn-primary">
+                <i class="fa fa-plus mr-1"></i> 新奖励
+              </button>
+            </div>
+            
+            <!-- 奖励筛选标签 -->
+            <div class="flex space-x-2 overflow-x-auto pb-2">
+              <button class="reward-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-primary text-white" data-filter="all">
+                全部奖励
+              </button>
+              <button class="reward-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-gray-200 text-dark" data-filter="available">
+                可兑换 (${availableRewards.length})
+              </button>
+              <button class="reward-filter-btn whitespace-nowrap px-4 py-2 rounded-full bg-gray-200 text-dark" data-filter="redeemed">
+                已兑换 (${redeemedRewards.length})
+              </button>
+            </div>
+            
+            <!-- 奖励列表 -->
+            <div id="rewards-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${this.renderRewardList(appData.rewards)}
+            </div>
+          </div>
+        `;
+      },
+      
+      // 渲染奖励列表
+      renderRewardList(rewards) {
+        if (rewards.length === 0) {
+          return `
+            <div class="col-span-2 text-center py-8 text-muted">
+              <i class="fa fa-gift text-4xl mb-3"></i>
+              <p class="text-lg">暂无奖励</p>
+              <p class="mt-1">点击"新奖励"按钮创建奖励</p>
+            </div>
+          `;
+        }
+        
+        return rewards.map(reward => {
+          const creator = appData.users.find(u => u.id === reward.creatorId);
+          const redeemer = reward.redeemerId ? appData.users.find(u => u.id === reward.redeemerId) : null;
+          let statusBadge = '';
+          let actionButton = '';
+          
+          // 根据奖励状态设置徽章
+          if (reward.status === 'available') {
+            statusBadge = '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">可兑换</span>';
+            
+            // 如果当前用户不是奖励创建者，显示"兑换"按钮
+            if (appData.currentUserId !== reward.creatorId) {
+              // 检查余额是否足够
+              const currentUser = utils.getCurrentUser();
+              if (currentUser.balance >= reward.costAmount) {
+                actionButton = `
+                  <button class="reward-action-btn w-full py-1 rounded-full bg-primary text-white text-sm" data-reward-id="${reward.id}" data-action="redeem">
+                    兑换
+                  </button>
+                `;
+              } else {
+                actionButton = `
+                  <button class="w-full py-1 rounded-full bg-gray-300 text-gray-500 text-sm cursor-not-allowed" disabled>
+                    ${currentUser.currencyName}不足
+                  </button>
+                `;
+              }
+            }
+          } else if (reward.status === 'redeemed') {
+            statusBadge = '<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">已兑换</span>';
+          }
+          
+          return `
+            <div class="reward-card bg-white p-4 rounded-xl shadow-sm">
+              <div class="flex justify-between items-start">
+                <h3 class="font-medium text-dark">${reward.title}</h3>
+                ${statusBadge}
+              </div>
+              
+              <p class="text-sm text-muted mt-2">${reward.description}</p>
+              
+              <div class="mt-3 flex justify-between items-center">
+                <span class="font-bold" style="color: ${creator.color}">
+                  ${reward.costAmount} ${creator.currencyName}
+                </span>
+                <span class="text-xs text-muted">
+                  ${creator.name}提供
+                </span>
+              </div>
+              
+              ${actionButton ? `
+                <div class="mt-3">
+                  ${actionButton}
+                </div>
+              ` : ''}
+              
+              ${redeemer ? `
+                <div class="mt-2 p-2 bg-gray-50 rounded text-xs">
+                  <span class="text-muted">兑换者:</span> ${redeemer.name}
+                  <br>
+                  <span class="text-muted">兑换时间:</span> ${utils.formatDate(reward.redeemedAt)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      },
+      
+      // 渲染历史记录页面
+      history() {
+        // 获取当前用户的交易记录
+        const userTransactions = appData.transactions.filter(tx => tx.userId === appData.currentUserId);
+        
+        // 按日期分组
+        const groupedTransactions = {};
+        userTransactions.forEach(tx => {
+          const date = tx.timestamp.split('T')[0];
+          if (!groupedTransactions[date]) {
+            groupedTransactions[date] = [];
+          }
+          groupedTransactions[date].push(tx);
+        });
+        
+        // 生成日期列表（从新到旧）
+        const dateList = Object.keys(groupedTransactions).sort((a, b) => new Date(b) - new Date(a));
+        
+        return `
+          <div class="space-y-6">
+            <div class="flex justify-between items-center">
+              <h1 class="text-2xl font-bold text-dark">${currentUser.currencyName}记录</h1>
+              <div class="bg-white px-4 py-2 rounded-full shadow-sm">
+                <span class="text-muted">当前余额:</span>
+                <span class="font-bold text-primary ml-1">${utils.getCurrentUser().balance} ${currentUser.currencyName}</span>
+              </div>
+            </div>
+            
+            <!-- 统计图表 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+              <h2 class="text-lg font-bold text-dark mb-4">收支统计</h2>
+              <div class="h-64">
+                <canvas id="transactions-chart"></canvas>
+              </div>
+            </div>
+            
+            <!-- 交易记录 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+              <h2 class="text-lg font-bold text-dark mb-4">交易历史</h2>
+              
+              ${dateList.length > 0 ? `
+                <div class="space-y-4">
+                  ${dateList.map(date => {
+                    const transactions = groupedTransactions[date];
+                    return `
+                      <div>
+                        <h3 class="text-sm text-muted font-medium mb-2">${formatDateForDisplay(date)}</h3>
+                        <div class="space-y-2">
+                          ${transactions.map(tx => {
+                            const isIncome = tx.amount > 0;
+                            const iconClass = isIncome ? 'fa-arrow-down text-green-500' : 'fa-arrow-up text-red-500';
+                            
+                            return `
+                              <div class="flex justify-between items-center p-2 border-b">
+                                <div class="flex items-center">
+                                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                                    <i class="fa ${iconClass}"></i>
+                                  </div>
+                                  <div>
+                                    <p class="text-sm font-medium">${tx.description}</p>
+                                    <p class="text-xs text-muted">${utils.formatDate(tx.timestamp).split(' ')[1]}</p>
+                                  </div>
+                                </div>
+                                <span class="font-bold ${isIncome ? 'text-green-500' : 'text-red-500'}">
+                                  ${isIncome ? '+' : ''}${tx.amount} ${currentUser.currencyName}
+                                </span>
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              ` : `
+                <div class="text-center py-8 text-muted">
+                  <i class="fa fa-history text-4xl mb-3"></i>
+                  <p class="text-lg">暂无交易记录</p>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    // 辅助函数：格式化日期显示
+    function formatDateForDisplay(dateString) {
+      const date = new Date(dateString);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (date.toDateString() === today.toDateString()) {
+        return '今天';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return '昨天';
+      } else {
+        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+      }
+    }
+
+    // 更新UI
+    function updateUI() {
+      const currentUser = utils.getCurrentUser();
+      const partnerUser = utils.getPartnerUser();
+      
+      // 更新用户余额显示
+      document.getElementById('current-user-name').textContent = currentUser.name;
+      document.getElementById('current-user-balance').textContent = currentUser.balance;
+      document.getElementById('currency-symbol').textContent = currentUser.currencyName;
+      document.getElementById('user-balance').classList.remove('hidden');
+      document.getElementById('user-balance').classList.add('flex');
+      
+      // 更新设置页面
+      document.getElementById('settings-user1-name').value = appData.users[0].name;
+      document.getElementById('settings-user2-name').value = appData.users[1].name;
+      document.getElementById('settings-user1-currency').value = appData.users[0].currencyName;
+      document.getElementById('settings-user2-currency').value = appData.users[1].currencyName;
+      
+      // 根据当前用户更新余额调整部分
+      document.getElementById('settings-current-user-label').textContent = `${currentUser.name}的余额`;
+      document.getElementById('settings-partner-user-label').textContent = `${partnerUser.name}的余额`;
+      
+      // 根据当前用户ID设置余额输入框的值
+      if (appData.currentUserId === 'user1') {
+        document.getElementById('settings-current-user-balance').value = appData.users[0].balance;
+        document.getElementById('settings-partner-user-balance').value = appData.users[1].balance;
+      } else {
+        document.getElementById('settings-current-user-balance').value = appData.users[1].balance;
+        document.getElementById('settings-partner-user-balance').value = appData.users[0].balance;
+      }
+      
+      document.getElementById('settings-current-user-currency-symbol').textContent = currentUser.currencyName;
+      document.getElementById('settings-partner-user-currency-symbol').textContent = partnerUser.currencyName;
+      
+      // 更新新建任务弹窗
+      document.getElementById('new-task-currency').textContent = currentUser.currencyName;
+      document.getElementById('new-reward-currency').textContent = currentUser.currencyName;
+      
+      // 更新任务接收者选项
+      const taskAssignee = document.getElementById('task-assignee');
+      taskAssignee.innerHTML = '';
+      appData.users.forEach(user => {
+        if (user.id !== appData.currentUserId) {
+          const option = document.createElement('option');
+          option.value = user.id;
+          option.textContent = user.name;
+          taskAssignee.appendChild(option);
+        }
+      });
+      
+      // 加载当前页面
+      loadPage(currentPage);
+    }
+
+    // 当前页面
+    let currentPage = 'dashboard';
+
+    // 加载页面
+    function loadPage(pageName) {
+      const pageContent = document.getElementById('page-content');
+      
+      // 更新当前页面
+      currentPage = pageName;
+      
+      // 更新导航按钮状态
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.page === pageName) {
+          btn.classList.add('text-primary');
+          btn.classList.remove('text-muted');
+        } else {
+          btn.classList.add('text-muted');
+          btn.classList.remove('text-primary');
+        }
+      });
+      
+      // 渲染页面内容
+      if (renderPages[pageName]) {
+        pageContent.innerHTML = renderPages[pageName]();
+        
+        // 绑定页面特定事件
+        bindPageEvents(pageName);
+      } else {
+        pageContent.innerHTML = '<div class="text-center py-8"><p class="text-xl text-muted">页面不存在</p></div>';
+      }
+    }
+
+    // 绑定页面特定事件
+    function bindPageEvents(pageName) {
+      if (pageName === 'tasks') {
+        // 任务筛选按钮
+        document.querySelectorAll('.task-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            // 更新按钮样式
+            document.querySelectorAll('.task-filter-btn').forEach(b => {
+              b.classList.remove('bg-primary', 'text-white');
+              b.classList.add('bg-gray-200', 'text-dark');
+            });
+            btn.classList.remove('bg-gray-200', 'text-dark');
+            btn.classList.add('bg-primary', 'text-white');
+            
+            // 筛选任务
+            const filter = btn.dataset.filter;
+            let filteredTasks = appData.tasks;
+            
+            if (filter !== 'all') {
+              filteredTasks = appData.tasks.filter(task => task.status === filter);
+            }
+            
+            // 更新任务列表
+            document.getElementById('tasks-list').innerHTML = renderPages.renderTaskList(filteredTasks);
+            
+            // 绑定任务操作按钮事件
+            bindTaskActionEvents();
+          });
+        });
+        
+        // 绑定任务操作按钮事件
+        bindTaskActionEvents();
+        
+        // 新任务按钮
+        document.getElementById('tasks-new-task-btn').addEventListener('click', () => {
+          document.getElementById('new-task-modal').classList.remove('hidden');
+        });
+      } else if (pageName === 'rewards') {
+        // 奖励筛选按钮
+        document.querySelectorAll('.reward-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            // 更新按钮样式
+            document.querySelectorAll('.reward-filter-btn').forEach(b => {
+              b.classList.remove('bg-primary', 'text-white');
+              b.classList.add('bg-gray-200', 'text-dark');
+            });
+            btn.classList.remove('bg-gray-200', 'text-dark');
+            btn.classList.add('bg-primary', 'text-white');
+            
+            // 筛选奖励
+            const filter = btn.dataset.filter;
+            let filteredRewards = appData.rewards;
+            
+            if (filter !== 'all') {
+              filteredRewards = appData.rewards.filter(reward => reward.status === filter);
+            }
+            
+            // 更新奖励列表
+            document.getElementById('rewards-list').innerHTML = renderPages.renderRewardList(filteredRewards);
+            
+            // 绑定奖励操作按钮事件
+            bindRewardActionEvents();
+          });
+        });
+        
+        // 绑定奖励操作按钮事件
+        bindRewardActionEvents();
+        
+        // 新奖励按钮
+        document.getElementById('rewards-new-reward-btn').addEventListener('click', () => {
+          document.getElementById('new-reward-modal').classList.remove('hidden');
+        });
+      } else if (pageName === 'history') {
+        // 渲染交易图表
+        renderTransactionsChart();
+      } else if (pageName === 'dashboard') {
+        // 新任务按钮
+        document.getElementById('new-task-btn').addEventListener('click', () => {
+          document.getElementById('new-task-modal').classList.remove('hidden');
+        });
+        
+        // 新奖励按钮
+        document.getElementById('new-reward-btn').addEventListener('click', () => {
+          document.getElementById('new-reward-modal').classList.remove('hidden');
+        });
+        
+        // 切换用户按钮
+        document.getElementById('switch-user-btn').addEventListener('click', () => {
+          utils.switchUser();
+        });
+        
+        // 任务卡片点击事件
+        document.querySelectorAll('.task-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const taskId = card.dataset.taskId;
+            showTaskDetail(taskId);
+          });
+        });
+        
+        // 奖励卡片点击事件
+        document.querySelectorAll('.reward-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const rewardId = card.dataset.rewardId;
+            showRewardDetail(rewardId);
+          });
+        });
+        
+        // 导航链接
+        document.querySelectorAll('[data-navigate]').forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadPage(link.dataset.navigate);
+          });
+        });
+      }
+    }
+
+    // 绑定任务操作按钮事件
+    function bindTaskActionEvents() {
+      // 任务操作按钮
+      document.querySelectorAll('.task-action-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const taskId = btn.dataset.taskId;
+          const action = btn.dataset.action;
+          const task = appData.tasks.find(t => t.id === taskId);
+          
+          if (!task) return;
+          
+          if (action === 'complete') {
+            // 标记任务为已完成
+            utils.showConfirmDialog('确认完成', `你确定要标记"${task.title}"为已完成吗？`, () => {
+              utils.updateTaskStatus(taskId, 'completed');
+              updateUI();
+              utils.showNotification('任务完成', `任务"${task.title}"已标记为完成，等待审核`);
+            });
+          } else if (action === 'verify') {
+            // 审核任务
+            showTaskVerification(taskId);
+          }
+        });
+      });
+      
+      // 任务卡片点击事件
+      document.querySelectorAll('.task-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const taskId = card.dataset.taskId;
+          showTaskDetail(taskId);
+        });
+      });
+    }
+
+    // 绑定奖励操作按钮事件
+    function bindRewardActionEvents() {
+      // 奖励操作按钮
+      document.querySelectorAll('.reward-action-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const rewardId = btn.dataset.rewardId;
+          const action = btn.dataset.action;
+          const reward = appData.rewards.find(r => r.id === rewardId);
+          
+          if (!reward) return;
+          
+          if (action === 'redeem') {
+            // 兑换奖励
+            const creator = appData.users.find(u => u.id === reward.creatorId);
+          utils.showConfirmDialog('确认兑换', `你确定要用${reward.costAmount}${creator.currencyName}兑换"${reward.title}"吗？`, () => {
+              if (utils.redeemReward(rewardId)) {
+                updateUI();
+                utils.showNotification('兑换成功', `成功兑换奖励"${reward.title}"`);
+              }
+            });
+          }
+        });
+      });
+      
+      // 奖励卡片点击事件
+      document.querySelectorAll('.reward-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const rewardId = card.dataset.rewardId;
+          showRewardDetail(rewardId);
+        });
+      });
+    }
+
+    // 显示任务详情
+    function showTaskDetail(taskId) {
+      const task = appData.tasks.find(t => t.id === taskId);
+      
+      if (!task) return;
+      
+      const creator = appData.users.find(u => u.id === task.creatorId);
+      const assignee = appData.users.find(u => u.id === task.assigneeId);
+      
+      let statusText = '';
+      if (task.status === 'pending') {
+        statusText = '待完成';
+      } else if (task.status === 'completed') {
+        statusText = '待审核';
+      } else if (task.status === 'verified') {
+        statusText = '已完成';
+      }
+      
+      document.getElementById('task-detail-title').textContent = task.title;
+      
+      document.getElementById('task-detail-content').innerHTML = `
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm text-muted">任务描述</h3>
+            <p class="mt-1">${task.description}</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <h3 class="text-sm text-muted">创建者</h3>
+              <p class="mt-1 font-medium" style="color: ${creator.color}">${creator.name}</p>
+            </div>
+            <div>
+              <h3 class="text-sm text-muted">接收者</h3>
+              <p class="mt-1 font-medium" style="color: ${assignee.color}">${assignee.name}</p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">奖励</h3>
+            <p class="mt-1 font-bold" style="color: ${creator.color}">${task.rewardAmount} ${creator.currencyName}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">状态</h3>
+            <p class="mt-1">${statusText}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">创建时间</h3>
+            <p class="mt-1">${utils.formatDate(task.createdAt)}</p>
+          </div>
+          
+          ${task.completedAt ? `
+            <div>
+              <h3 class="text-sm text-muted">完成时间</h3>
+              <p class="mt-1">${utils.formatDate(task.completedAt)}</p>
+            </div>
+          ` : ''}
+          
+          ${task.verifiedAt ? `
+            <div>
+              <h3 class="text-sm text-muted">审核时间</h3>
+              <p class="mt-1">${utils.formatDate(task.verifiedAt)}</p>
+            </div>
+          ` : ''}
+          
+          ${task.verificationNotes ? `
+            <div>
+              <h3 class="text-sm text-muted">审核备注</h3>
+              <p class="mt-1 p-2 bg-gray-50 rounded">${task.verificationNotes}</p>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      // 设置操作按钮
+      const actionsContainer = document.getElementById('task-detail-actions');
+      actionsContainer.innerHTML = '';
+      
+      // 如果当前用户是任务创建者，并且任务状态为"待完成"，显示编辑和删除按钮
+      if (appData.currentUserId === task.creatorId && task.status === 'pending') {
+        // 编辑按钮
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn-secondary flex-1';
+        editBtn.innerHTML = '<i class="fa fa-pencil mr-1"></i> 编辑';
+        editBtn.addEventListener('click', () => {
+          editTask(taskId);
+        });
+        actionsContainer.appendChild(editBtn);
+        
+        // 删除按钮
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-danger flex-1 ml-2';
+        deleteBtn.innerHTML = '<i class="fa fa-trash mr-1"></i> 删除';
+        deleteBtn.addEventListener('click', () => {
+          document.getElementById('task-detail-modal').classList.add('hidden');
+          utils.showConfirmDialog('确认删除', `你确定要删除任务"${task.title}"吗？此操作不可撤销。`, () => {
+            if (utils.deleteTask(taskId)) {
+              updateUI();
+              utils.showNotification('删除成功', `任务"${task.title}"已删除`);
+            }
+          });
+        });
+        actionsContainer.appendChild(deleteBtn);
+      }
+      
+      // 根据任务状态和当前用户显示不同的操作按钮
+      if (task.status === 'pending') {
+        // 如果当前用户是任务接收者，显示"标记完成"按钮
+        if (appData.currentUserId === task.assigneeId) {
+          const completeBtn = document.createElement('button');
+          completeBtn.className = 'btn-primary flex-1';
+          completeBtn.textContent = '标记完成';
+          completeBtn.addEventListener('click', () => {
+            document.getElementById('task-detail-modal').classList.add('hidden');
+            utils.showConfirmDialog('确认完成', `你确定要标记"${task.title}"为已完成吗？`, () => {
+              utils.updateTaskStatus(taskId, 'completed');
+              updateUI();
+              utils.showNotification('任务完成', `任务"${task.title}"已标记为完成，等待审核`);
+            });
+          });
+          actionsContainer.appendChild(completeBtn);
+        }
+      } else if (task.status === 'completed') {
+        // 如果当前用户是任务创建者，显示"审核"按钮
+        if (appData.currentUserId === task.creatorId) {
+          const verifyBtn = document.createElement('button');
+          verifyBtn.className = 'btn-primary flex-1';
+          verifyBtn.textContent = '审核';
+          verifyBtn.addEventListener('click', () => {
+            document.getElementById('task-detail-modal').classList.add('hidden');
+            showTaskVerification(taskId);
+          });
+          actionsContainer.appendChild(verifyBtn);
+        }
+      }
+      
+      // 关闭按钮
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'btn-outline flex-1 ml-2';
+      closeBtn.textContent = '关闭';
+      closeBtn.addEventListener('click', () => {
+        document.getElementById('task-detail-modal').classList.add('hidden');
+      });
+      actionsContainer.appendChild(closeBtn);
+      
+      // 显示弹窗
+      document.getElementById('task-detail-modal').classList.remove('hidden');
+    }
+    
+    // 编辑任务
+    function editTask(taskId) {
+      const task = appData.tasks.find(t => t.id === taskId);
+      
+      if (!task) return;
+      
+      // 填充表单数据
+      document.getElementById('edit-task-id').value = task.id;
+      document.getElementById('edit-task-title').value = task.title;
+      document.getElementById('edit-task-description').value = task.description;
+      document.getElementById('edit-task-reward').value = task.rewardAmount;
+      
+      // 设置货币名称
+      const currentUser = utils.getCurrentUser();
+      document.getElementById('edit-task-currency').textContent = currentUser.currencyName;
+      
+      // 关闭任务详情弹窗
+      document.getElementById('task-detail-modal').classList.add('hidden');
+      
+      // 显示编辑任务弹窗
+      document.getElementById('edit-task-modal').classList.remove('hidden');
+    }
+
+    // 显示任务审核界面
+    function showTaskVerification(taskId) {
+      const task = appData.tasks.find(t => t.id === taskId);
+      
+      if (!task) return;
+      
+      document.getElementById('task-detail-title').textContent = '审核任务';
+      
+      document.getElementById('task-detail-content').innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-sm text-muted">任务</h3>
+            <p class="mt-1 font-medium">${task.title}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">审核备注</h3>
+            <textarea id="verification-notes" class="input-field mt-1" rows="3" placeholder="添加审核备注..."></textarea>
+          </div>
+          
+          <div class="flex items-center mt-2">
+            <input type="checkbox" id="approve-task" class="mr-2">
+            <label for="approve-task" class="text-sm">批准并发放奖励</label>
+          </div>
+        </div>
+      `;
+      
+      // 设置操作按钮
+      const actionsContainer = document.getElementById('task-detail-actions');
+      actionsContainer.innerHTML = '';
+      
+      // 提交按钮
+      const submitBtn = document.createElement('button');
+      submitBtn.className = 'btn-primary flex-1';
+      submitBtn.textContent = '提交审核';
+      submitBtn.addEventListener('click', () => {
+        const notes = document.getElementById('verification-notes').value;
+        const isApproved = document.getElementById('approve-task').checked;
+        
+        document.getElementById('task-detail-modal').classList.add('hidden');
+        
+        if (isApproved) {
+          // 批准任务
+          utils.updateTaskStatus(taskId, 'verified', notes);
+          updateUI();
+          const creator = appData.users.find(u => u.id === task.creatorId);
+          utils.showNotification('审核通过', `任务"${task.title}"审核通过，已发放${task.rewardAmount}${creator.currencyName}`);
+        } else {
+          // 拒绝任务，将状态改回待完成
+          utils.updateTaskStatus(taskId, 'pending', notes);
+          updateUI();
+          utils.showNotification('审核拒绝', `任务"${task.title}"审核未通过，请重新完成`);
+        }
+      });
+      actionsContainer.appendChild(submitBtn);
+      
+      // 关闭按钮
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'btn-outline flex-1 ml-2';
+      closeBtn.textContent = '取消';
+      closeBtn.addEventListener('click', () => {
+        document.getElementById('task-detail-modal').classList.add('hidden');
+      });
+      actionsContainer.appendChild(closeBtn);
+      
+      // 显示弹窗
+      document.getElementById('task-detail-modal').classList.remove('hidden');
+    }
+
+    // 显示奖励详情
+    function showRewardDetail(rewardId) {
+      const reward = appData.rewards.find(r => r.id === rewardId);
+      
+      if (!reward) return;
+      
+      const creator = appData.users.find(u => u.id === reward.creatorId);
+      const redeemer = reward.redeemerId ? appData.users.find(u => u.id === reward.redeemerId) : null;
+      
+      let statusText = '';
+      if (reward.status === 'available') {
+        statusText = '可兑换';
+      } else if (reward.status === 'redeemed') {
+        statusText = '已兑换';
+      }
+      
+      document.getElementById('reward-detail-title').textContent = reward.title;
+      
+      document.getElementById('reward-detail-content').innerHTML = `
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm text-muted">奖励描述</h3>
+            <p class="mt-1">${reward.description}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">提供者</h3>
+            <p class="mt-1 font-medium" style="color: ${creator.color}">${creator.name}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">所需${creator.currencyName}</h3>
+            <p class="mt-1 font-bold" style="color: ${creator.color}">${reward.costAmount} ${creator.currencyName}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">状态</h3>
+            <p class="mt-1">${statusText}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm text-muted">创建时间</h3>
+            <p class="mt-1">${utils.formatDate(reward.createdAt)}</p>
+          </div>
+          
+          ${redeemer ? `
+            <div>
+              <h3 class="text-sm text-muted">兑换者</h3>
+              <p class="mt-1 font-medium" style="color: ${redeemer.color}">${redeemer.name}</p>
+            </div>
+            
+            <div>
+              <h3 class="text-sm text-muted">兑换时间</h3>
+              <p class="mt-1">${utils.formatDate(reward.redeemedAt)}</p>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      // 设置操作按钮
+      const actionsContainer = document.getElementById('reward-detail-actions');
+      actionsContainer.innerHTML = '';
+      
+      // 如果奖励可兑换且当前用户不是创建者，显示"兑换"按钮
+      if (reward.status === 'available' && appData.currentUserId !== reward.creatorId) {
+        const currentUser = utils.getCurrentUser();
+        
+        if (currentUser.balance >= reward.costAmount) {
+          const redeemBtn = document.createElement('button');
+          redeemBtn.className = 'btn-primary flex-1';
+          redeemBtn.textContent = '兑换';
+          redeemBtn.addEventListener('click', () => {
+            document.getElementById('reward-detail-modal').classList.add('hidden');
+            const creator = appData.users.find(u => u.id === reward.creatorId);
+          utils.showConfirmDialog('确认兑换', `你确定要用${reward.costAmount}${creator.currencyName}兑换"${reward.title}"吗？`, () => {
+              if (utils.redeemReward(rewardId)) {
+                updateUI();
+                utils.showNotification('兑换成功', `成功兑换奖励"${reward.title}"`);
+              }
+            });
+          });
+          actionsContainer.appendChild(redeemBtn);
+        } else {
+          const noBalanceBtn = document.createElement('button');
+          noBalanceBtn.className = 'bg-gray-300 text-gray-500 px-4 py-2 rounded-full flex-1 cursor-not-allowed';
+          noBalanceBtn.textContent = `${appData.currencyName}不足`;
+          noBalanceBtn.disabled = true;
+          actionsContainer.appendChild(noBalanceBtn);
+        }
+      }
+      
+      // 关闭按钮
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'btn-outline flex-1 ml-2';
+      closeBtn.textContent = '关闭';
+      closeBtn.addEventListener('click', () => {
+        document.getElementById('reward-detail-modal').classList.add('hidden');
+      });
+      actionsContainer.appendChild(closeBtn);
+      
+      // 显示弹窗
+      document.getElementById('reward-detail-modal').classList.remove('hidden');
+    }
+
+    // 渲染交易图表
+    function renderTransactionsChart() {
+      // 获取当前用户的交易记录
+      const userTransactions = appData.transactions.filter(tx => tx.userId === appData.currentUserId);
+      
+      // 如果没有交易记录，不渲染图表
+      if (userTransactions.length === 0) {
+        return;
+      }
+      
+      // 按日期分组并计算每日余额
+      const balanceData = {};
+      let currentBalance = 0;
+      
+      // 按时间排序
+      const sortedTransactions = [...userTransactions].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      
+      // 计算初始余额
+      const firstTxDate = new Date(sortedTransactions[0].timestamp);
+      const initialDate = new Date(firstTxDate);
+      initialDate.setDate(initialDate.getDate() - 1);
+      
+      // 获取用户初始余额（假设为100）
+      const initialBalance = 100;
+      balanceData[initialDate.toISOString().split('T')[0]] = initialBalance;
+      currentBalance = initialBalance;
+      
+      // 计算每日余额
+      sortedTransactions.forEach(tx => {
+        const date = tx.timestamp.split('T')[0];
+        currentBalance += tx.amount;
+        balanceData[date] = currentBalance;
+      });
+      
+      // 准备图表数据
+      const labels = Object.keys(balanceData).sort();
+      const data = labels.map(date => balanceData[date]);
+      
+      // 获取Canvas上下文
+      const ctx = document.getElementById('transactions-chart').getContext('2d');
+      
+      // 销毁旧图表（如果存在）
+      if (window.transactionsChart) {
+        window.transactionsChart.destroy();
+      }
+      
+      // 创建新图表
+      window.transactionsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.map(formatDateForChart),
+          datasets: [{
+            label: `${appData.currencyName}余额`,
+            data: data,
+            borderColor: '#FF6B8B',
+            backgroundColor: 'rgba(255, 107, 139, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#FF6B8B',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed.y} ${appData.currencyName}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              beginAtZero: false,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              ticks: {
+                callback: function(value) {
+                  return value + ' ' + appData.currencyName;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 格式化图表日期
+    function formatDateForChart(dateString) {
+      const date = new Date(dateString);
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    }
+
+    // 初始化应用
+    async function initApp() {
+      // 绑定导航按钮事件
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadPage(btn.dataset.page);
+        });
+      });
+      
+      // 绑定设置按钮事件
+      document.getElementById('settings-btn').addEventListener('click', () => {
+        document.getElementById('settings-modal').classList.remove('hidden');
+      });
+      
+      // 绑定关闭设置按钮事件
+      document.getElementById('close-settings').addEventListener('click', () => {
+        document.getElementById('settings-modal').classList.add('hidden');
+      });
+      
+      // 绑定保存设置按钮事件
+      document.getElementById('save-settings-btn').addEventListener('click', () => {
+        const user1Name = document.getElementById('settings-user1-name').value;
+        const user2Name = document.getElementById('settings-user2-name').value;
+        const user1Currency = document.getElementById('settings-user1-currency').value;
+        const user2Currency = document.getElementById('settings-user2-currency').value;
+        
+        // 获取当前用户和对方用户的余额
+        let currentUserBalance, partnerUserBalance;
+        if (appData.currentUserId === 'user1') {
+          currentUserBalance = parseInt(document.getElementById('settings-current-user-balance').value);
+          partnerUserBalance = parseInt(document.getElementById('settings-partner-user-balance').value);
+        } else {
+          currentUserBalance = parseInt(document.getElementById('settings-current-user-balance').value);
+          partnerUserBalance = parseInt(document.getElementById('settings-partner-user-balance').value);
+        }
+        
+        // 验证输入
+        if (!user1Name || !user2Name || !user1Currency || !user2Currency) {
+          utils.showNotification('保存失败', '请填写所有必填字段', 'error');
+          return;
+        }
+        
+        if (isNaN(currentUserBalance) || currentUserBalance < 0) {
+          utils.showNotification('保存失败', '请输入有效的余额（非负整数）', 'error');
+          return;
+        }
+        
+        if (isNaN(partnerUserBalance) || partnerUserBalance < 0) {
+          utils.showNotification('保存失败', '请输入有效的余额（非负整数）', 'error');
+          return;
+        }
+        
+        // 更新数据
+        appData.users[0].name = user1Name;
+        appData.users[1].name = user2Name;
+        appData.users[0].currencyName = user1Currency;
+        appData.users[1].currencyName = user2Currency;
+        
+        // 记录余额变更
+        let oldCurrentUserBalance, oldPartnerUserBalance;
+        
+        if (appData.currentUserId === 'user1') {
+          oldCurrentUserBalance = appData.users[0].balance;
+          oldPartnerUserBalance = appData.users[1].balance;
+          
+          appData.users[0].balance = currentUserBalance;
+          appData.users[1].balance = partnerUserBalance;
+        } else {
+          oldCurrentUserBalance = appData.users[1].balance;
+          oldPartnerUserBalance = appData.users[0].balance;
+          
+          appData.users[1].balance = currentUserBalance;
+          appData.users[0].balance = partnerUserBalance;
+        }
+        
+        // 如果余额有变化，记录交易
+        if (oldCurrentUserBalance !== currentUserBalance) {
+          const amount = currentUserBalance - oldCurrentUserBalance;
+          utils.recordTransaction('balance_adjustment', amount, `手动调整${currentUser.currencyName}`, currentUser.id);
+        }
+        
+        if (oldPartnerUserBalance !== partnerUserBalance) {
+          const amount = partnerUserBalance - oldPartnerUserBalance;
+          utils.recordTransaction('balance_adjustment', amount, `手动调整${partnerUser.currencyName}`, partnerUser.id);
+        }
+        
+        // 保存数据
+        utils.saveData();
+        
+        // 更新UI
+        updateUI();
+        
+        // 关闭设置弹窗
+        document.getElementById('settings-modal').classList.add('hidden');
+        
+        utils.showNotification('保存成功', '设置已更新');
+      });
+      
+      // 绑定保存数据按钮事件
+      document.getElementById('save-data-btn').addEventListener('click', () => {
+        utils.exportData();
+      });
+      
+      // 绑定清除数据按钮事件
+      document.getElementById('clear-data-btn').addEventListener('click', () => {
+        utils.clearData();
+      });
+      
+      // 绑定关闭通知按钮事件
+      document.getElementById('close-notification').addEventListener('click', () => {
+        document.getElementById('notification').classList.add('translate-x-full');
+      });
+      
+      // 绑定关闭弹窗按钮事件
+      document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          // 找到最近的弹窗容器并关闭它
+          const modal = btn.closest('.fixed.inset-0.z-50');
+          if (modal) {
+            modal.classList.add('hidden');
+          }
+        });
+      });
+      
+      // 绑定新建任务表单提交事件
+      document.getElementById('new-task-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('task-title').value;
+        const description = document.getElementById('task-description').value;
+        const rewardAmount = parseInt(document.getElementById('task-reward').value);
+        const assigneeId = document.getElementById('task-assignee').value;
+        
+        if (!title || !description || !rewardAmount || !assigneeId) {
+          utils.showNotification('创建失败', '请填写所有必填字段', 'error');
+          return;
+        }
+        
+        // 创建任务
+        utils.createTask(title, description, rewardAmount, assigneeId);
+        
+        // 重置表单
+        document.getElementById('new-task-form').reset();
+        
+        // 关闭弹窗
+        document.getElementById('new-task-modal').classList.add('hidden');
+        
+        // 更新UI
+        updateUI();
+        
+        utils.showNotification('创建成功', `任务"${title}"已发布`);
+      });
+      
+      // 绑定编辑任务表单提交事件
+      document.getElementById('edit-task-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const taskId = document.getElementById('edit-task-id').value;
+        const title = document.getElementById('edit-task-title').value;
+        const description = document.getElementById('edit-task-description').value;
+        const rewardAmount = parseInt(document.getElementById('edit-task-reward').value);
+        
+        if (!title || !description || !rewardAmount) {
+          utils.showNotification('保存失败', '请填写所有必填字段', 'error');
+          return;
+        }
+        
+        // 更新任务
+        const task = appData.tasks.find(t => t.id === taskId);
+        if (task) {
+          task.title = title;
+          task.description = description;
+          task.rewardAmount = rewardAmount;
+          
+          // 保存数据
+          utils.saveData();
+          
+          // 关闭弹窗
+          document.getElementById('edit-task-modal').classList.add('hidden');
+          
+          // 更新UI
+          updateUI();
+          
+          utils.showNotification('保存成功', `任务"${title}"已更新`);
+        }
+      });
+      
+      // 绑定新建奖励表单提交事件
+      document.getElementById('new-reward-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('reward-title').value;
+        const description = document.getElementById('reward-description').value;
+        const costAmount = parseInt(document.getElementById('reward-cost').value);
+        
+        if (!title || !description || !costAmount) {
+          utils.showNotification('创建失败', '请填写所有必填字段', 'error');
+          return;
+        }
+        
+        // 创建奖励
+        utils.createReward(title, description, costAmount);
+        
+        // 重置表单
+        document.getElementById('new-reward-form').reset();
+        
+        // 关闭弹窗
+        document.getElementById('new-reward-modal').classList.add('hidden');
+        
+        // 更新UI
+        updateUI();
+        
+        utils.showNotification('创建成功', `奖励"${title}"已创建`);
+      });
+      
+      // 绑定开始按钮事件
+      document.getElementById('start-btn').addEventListener('click', () => {
+        const user1Name = document.getElementById('user1-name').value;
+        const user2Name = document.getElementById('user2-name').value;
+        const user1Currency = document.getElementById('user1-currency').value;
+        const user2Currency = document.getElementById('user2-currency').value;
+        
+        if (!user1Name || !user2Name || !user1Currency || !user2Currency) {
+          utils.showNotification('设置失败', '请填写所有必填字段', 'error');
+          return;
+        }
+        
+        // 更新数据
+        appData.users[0].name = user1Name;
+        appData.users[1].name = user2Name;
+        appData.users[0].currencyName = user1Currency;
+        appData.users[1].currencyName = user2Currency;
+        
+        // 保存数据
+        utils.saveData();
+        
+        // 更新UI
+        updateUI();
+        
+        // 隐藏欢迎页面
+        document.getElementById('welcome-page').classList.add('hidden');
+        
+        // 加载首页
+        loadPage('dashboard');
+        
+        utils.showNotification('欢迎', `${user1Name}和${user2Name}的爱情之旅开始啦！`);
+      });
+      
+   // 绑定加载数据按钮事件（联网版本）
+document.getElementById('load-data-btn').addEventListener('click', async () => {
+    const ok = await utils.loadData();
+    if (ok) {
+        updateUI();
+        document.getElementById('welcome-page').classList.add('hidden');
+        loadPage('dashboard');
+    } else {
+        utils.showNotification('加载失败', '无法从服务器获取数据', 'error');
+    }
+});
+
+     // 页面加载时自动尝试从服务器获取数据
+(async () => {
+    const ok = await utils.loadData();
+    if (ok) {
+        updateUI();
+        document.getElementById('welcome-page').classList.add('hidden');
+        loadPage('dashboard');
+    }
+})();
+   }
+
+    // 页面加载完成后初始化应用
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+
+
+</body></html>
